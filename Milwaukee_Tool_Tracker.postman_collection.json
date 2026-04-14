@@ -1,0 +1,211 @@
+{
+  "info": {
+    "name": "Milwaukee Tool Tracker",
+    "description": "API Collection for Milwaukee ONE-KEY EMEA Challenge",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Get Token (Admin / Warehouse)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"client_id\": \"demo_user\",\n    \"client_secret\": \"secret123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/auth/token?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["auth", "token"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        },
+        {
+          "name": "Get Token (France Demo Account)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"client_id\": \"france_demo\",\n    \"client_secret\": \"france123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/auth/token?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["auth", "token"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Tools",
+      "item": [
+        {
+          "name": "Get Warehouse Tools",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ENTER_YOUR_TOKEN_HERE>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/tools?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["tools"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        },
+        {
+          "name": "Get Full Inventory (All Tools)",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ENTER_YOUR_TOKEN_HERE>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/tools/all?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["tools", "all"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Transfers",
+      "item": [
+        {
+          "name": "Get Demo Accounts",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ENTER_YOUR_TOKEN_HERE>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/accounts?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["accounts"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        },
+        {
+          "name": "Transfer Tools",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ENTER_YOUR_TOKEN_HERE>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"tool_ids\": [\"T001\", \"T002\"],\n    \"target_account\": \"FR\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:5000/transfer?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["transfer"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Logs",
+      "item": [
+        {
+          "name": "Get Audit Trail",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "<ENTER_YOUR_TOKEN_HERE>",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/audit?lang=en",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "5000",
+              "path": ["audit"],
+              "query": [{"key": "lang", "value": "en"}]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
