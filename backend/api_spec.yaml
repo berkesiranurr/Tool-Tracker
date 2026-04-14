@@ -1,0 +1,265 @@
+openapi: 3.0.3
+info:
+  title: Milwaukee Tool Tracking API
+  description: >
+    A simple API to track tool samples across European demo accounts.
+    Supports authentication, listing warehouse tools, and transferring
+    tools to country-specific demo accounts.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+
+paths:
+  /auth/token:
+    post:
+      summary: Get an access token
+      description: >
+        Authenticate using a client ID and secret to receive a JWT token.
+        The token must be included in the Authorization header for all
+        subsequent requests.
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [en, de]
+            default: en
+          description: Language for response messages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [client_id, client_secret]
+              properties:
+                client_id:
+                  type: string
+                  example: demo_user
+                client_secret:
+                  type: string
+                  example: secret123
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: You have been logged in successfully.
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIs...
+                  expires_in:
+                    type: integer
+                    example: 3600
+        "400":
+          description: Missing credentials
+        "401":
+          description: Invalid credentials
+
+  /tools:
+    get:
+      summary: List warehouse tools
+      description: >
+        Returns all tools currently in the central warehouse.
+        Requires a valid JWT token in the Authorization header.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [en, de]
+            default: en
+      responses:
+        "200":
+          description: Tool list retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  warehouse:
+                    type: string
+                    example: Central Warehouse
+                  tool_count:
+                    type: integer
+                    example: 8
+                  tools:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: T001
+                        name:
+                          type: string
+                          example: M18 FUEL™ Hammer Drill
+                        model:
+                          type: string
+                          example: 2904-20
+                        category:
+                          type: string
+                          example: Drilling
+                        status:
+                          type: string
+                          enum: [available, transferred]
+                          example: available
+                        serial_number:
+                          type: string
+                          example: SN-2024-001
+        "401":
+          description: Authentication required or token expired
+
+  /tools/all:
+    get:
+      summary: List all tools (full inventory)
+      description: >
+        Returns ALL tools — both available in the warehouse and already
+        transferred — with location and account information for transferred items.
+        Requires a valid JWT token.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [en, de]
+            default: en
+      responses:
+        "200":
+          description: Full tool inventory retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  warehouse:
+                    type: string
+                    example: Central Warehouse
+                  tool_count:
+                    type: integer
+                    example: 8
+                  tools:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        status:
+                          type: string
+                          enum: [available, transferred]
+                        location:
+                          type: string
+                          description: Country name (only present if transferred)
+                          example: Germany
+                        account_code:
+                          type: string
+                          description: Country code (only present if transferred)
+                          example: DE
+        "401":
+          description: Authentication required or token expired
+
+  /transfer:
+    post:
+      summary: Transfer tools to a demo account
+      description: >
+        Move one or more tools from the central warehouse to a
+        country-specific demo account. Each transfer is logged
+        in the audit trail.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: lang
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [en, de]
+            default: en
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tool_ids, target_account]
+              properties:
+                tool_ids:
+                  type: array
+                  items:
+                    type: string
+                  example: ["T001", "T002"]
+                target_account:
+                  type: string
+                  enum: [DE, FR, TR, IT, ES]
+                  example: DE
+      responses:
+        "200":
+          description: All tools transferred successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: The tool has been successfully moved to the selected country.
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tool_id:
+                          type: string
+                        success:
+                          type: boolean
+                        message:
+                          type: string
+                  transferred:
+                    type: integer
+                    example: 2
+                  failed:
+                    type: integer
+                    example: 0
+        "400":
+          description: No tools selected or invalid country
+        "401":
+          description: Authentication required
+        "207":
+          description: Partial success — some transfers failed
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from /auth/token

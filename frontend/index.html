@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Milwaukee Tool ONE-KEY EMEA — Tool Sample Tracking System" />
+  <title>Milwaukee Tool Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/d/de/Milwaukee_Logo.svg" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="header-logo">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/d/de/Milwaukee_Logo.svg" alt="Milwaukee" height="26" />
+        </div>
+        <div>
+          <div class="header-title" id="header-title">Milwaukee Tool Tracker</div>
+          <div class="header-subtitle" id="header-subtitle">ONE-KEY EMEA — Tool Sample Management</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="lang-switcher">
+          <button class="lang-btn active" data-lang="en">EN</button>
+          <button class="lang-btn" data-lang="de">DE</button>
+        </div>
+        <button class="btn btn-ghost hidden" id="btn-view-toggle">Show Full Inventory</button>
+        <button class="btn btn-ghost hidden" id="btn-audit">View Activity Log</button>
+        <button class="btn btn-ghost hidden" id="btn-logout">Sign Out</button>
+      </div>
+    </header>
+
+    <!-- Alert Container -->
+    <div id="alert-container"></div>
+
+    <!-- Login View -->
+    <div id="login-view">
+      <div class="login-container">
+        <div class="login-card">
+          <div class="login-header">
+            <div class="login-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            </div>
+            <h2 id="login-title">Sign In</h2>
+            <p id="login-subtitle">Enter your credentials to access the system</p>
+          </div>
+
+          <form id="login-form">
+            <div class="form-group">
+              <label for="client-id" id="label-client-id">Client ID</label>
+              <input type="text" id="client-id" placeholder="Enter your client ID" autocomplete="username" />
+            </div>
+            <div class="form-group">
+              <label for="client-secret" id="label-client-secret">Client Secret</label>
+              <input type="password" id="client-secret" placeholder="Enter your client secret" autocomplete="current-password" />
+            </div>
+            <button type="submit" class="btn btn-primary" id="btn-login">Sign In</button>
+          </form>
+
+          <div class="login-hint">
+            <p id="demo-hint">Demo credentials:</p>
+            <p><strong>Warehouse:</strong> <code>demo_user</code> / <code>secret123</code></p>
+            <p><strong>France:</strong> <code>france_demo</code> / <code>france123</code></p>
+            <p><strong>Germany:</strong> <code>germany_demo</code> / <code>germany123</code></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard View -->
+    <div id="dashboard-view" class="dashboard hidden">
+      <div class="dashboard-header">
+        <h2 id="dashboard-title">Warehouse Tools</h2>
+        <p id="dashboard-subtitle">Select tools below and transfer them to a demo account</p>
+      </div>
+
+      <!-- Transfer Bar -->
+      <div class="transfer-bar" id="transfer-bar">
+        <div class="form-group">
+          <label id="label-target">Target Demo Account</label>
+          <select id="target-account">
+            <option value="">Select a country...</option>
+          </select>
+        </div>
+        <div class="selected-count" id="selected-count">
+          <strong>0</strong> tools selected
+        </div>
+        <button class="btn btn-primary" id="btn-transfer" disabled>Transfer Selected Tools</button>
+      </div>
+
+      <!-- Tool Table -->
+      <div class="table-wrapper" id="table-section">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px">
+                <input type="checkbox" id="select-all" title="Select All" />
+              </th>
+              <th id="th-id">ID</th>
+              <th id="th-name">Tool Name</th>
+              <th id="th-model">Model</th>
+              <th id="th-category">Category</th>
+              <th id="th-status">Status</th>
+              <th id="th-serial">Serial Number</th>
+            </tr>
+          </thead>
+          <tbody id="tools-tbody"></tbody>
+        </table>
+        <div style="padding:8px 16px; font-size:12px; color:var(--gray-400);">
+          <label id="label-select-all" for="select-all" style="cursor:pointer">Select All</label>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="empty-state hidden">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg>
+        </div>
+        <p id="empty-text">All tools have been transferred. The warehouse is empty.</p>
+      </div>
+    </div>
+
+    <!-- Audit Modal -->
+    <div id="audit-modal" class="modal-overlay hidden">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="audit-modal-title">Activity Log</h3>
+          <button class="btn btn-ghost" id="btn-close-audit">Close</button>
+        </div>
+        <div class="modal-body">
+          <table>
+            <thead>
+              <tr>
+                <th id="th-audit-time">When</th>
+                <th id="th-audit-action">Action</th>
+                <th id="th-audit-user">Who</th>
+                <th id="th-audit-details">Details</th>
+                <th id="th-audit-status">Status</th>
+              </tr>
+            </thead>
+            <tbody id="audit-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p id="footer-text">Milwaukee Tool — ONE-KEY EMEA Digital Product Challenge</p>
+    </footer>
+
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
